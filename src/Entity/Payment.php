@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\PaymentRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Enum\PaymentMethod;
 
 #[ORM\Entity(repositoryClass: PaymentRepository::class)]
 #[ORM\Table(
@@ -26,8 +27,8 @@ class Payment
     #[ORM\JoinColumn(nullable: false)]
     private ?AccountEntry $accountEntry = null;
 
-    #[ORM\Column(length: 20)]
-    private ?string $method = null;
+    #[ORM\Column(length: 20, enumType: PaymentMethod::class)]
+    private ?PaymentMethod $method = null;
 
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $referenceNumber = null;

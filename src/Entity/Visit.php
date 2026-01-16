@@ -6,6 +6,7 @@ use App\Repository\VisitRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Enum\VisitStatus;
 
 #[ORM\Entity(repositoryClass: VisitRepository::class)]
 class Visit
@@ -26,8 +27,8 @@ class Visit
     #[ORM\Column]
     private ?\DateTimeImmutable $visitDate = null;
 
-    #[ORM\Column(length: 20)]
-    private ?string $status = null;
+    #[ORM\Column(length: 20, enumType: VisitStatus::class)]
+    private ?VisitStatus $status = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;

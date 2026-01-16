@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\AccountEntryRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Enum\AccountEntryType;
+use App\Enum\AccountSourceType;
 
 #[ORM\Entity(repositoryClass: AccountEntryRepository::class)]
 class AccountEntry
@@ -22,14 +24,14 @@ class AccountEntry
     #[ORM\JoinColumn(nullable: false)]
     private ?PatientAccount $account = null;
 
-    #[ORM\Column(length: 20)]
-    private ?string $entryType = null;
+    #[ORM\Column(length: 20, enumType: AccountEntryType::class)]
+    private ?AccountEntryType $entryType = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     private ?string $amount = null;
 
-    #[ORM\Column(length: 20)]
-    private ?string $sourceType = null;
+    #[ORM\Column(length: 20, enumType: AccountSourceType::class)]
+    private ?AccountSourceType $sourceType = null;
 
     #[ORM\Column(nullable: true)]
     private ?int $sourceId = null;
