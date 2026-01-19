@@ -3,17 +3,30 @@
 namespace App\Repository;
 
 use App\Entity\PatientAccount;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+#use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<PatientAccount>
+ * @extends TenantAwareRepository<PatientAccount>
  */
-class PatientAccountRepository extends ServiceEntityRepository
+class PatientAccountRepository extends TenantAwareRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, PatientAccount::class);
+    }
+    public function findAllForCompany(): array
+    {
+        return $this->qb('pa')->getQuery()->getResult();
+    }
+
+    public function findOneForCompany(int $id): ?PatientAccount
+    {
+        return $this->qb('pa')
+            ->andWhere('pa.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
     //    /**

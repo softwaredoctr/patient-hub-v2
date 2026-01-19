@@ -3,17 +3,30 @@
 namespace App\Repository;
 
 use App\Entity\AccountEntry;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+#use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<AccountEntry>
+ * @extends TenantAwareRepository<AccountEntry>
  */
-class AccountEntryRepository extends ServiceEntityRepository
+class AccountEntryRepository extends TenantAwareRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, AccountEntry::class);
+    }
+    public function findAllForCompany(): array
+    {
+        return $this->qb('ae')->getQuery()->getResult();
+    }
+
+    public function findOneForCompany(int $id): ?AccountEntry
+    {
+        return $this->qb('ae')
+            ->andWhere('ae.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
     //    /**

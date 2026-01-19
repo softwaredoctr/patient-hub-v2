@@ -3,17 +3,31 @@
 namespace App\Repository;
 
 use App\Entity\VisitItem;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+#use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<VisitItem>
+ * @extends TenantAwareRepository<VisitItem>
  */
-class VisitItemRepository extends ServiceEntityRepository
+class VisitItemRepository extends TenantAwareRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, VisitItem::class);
+    }
+    
+    public function findAllForCompany(): array
+    {
+        return $this->qb('vi')->getQuery()->getResult();
+    }
+
+    public function findOneForCompany(int $id): ?Patient
+    {
+        return $this->qb('vi')
+            ->andWhere('vi.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
     //    /**
