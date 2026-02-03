@@ -21,18 +21,29 @@ class AccountEntry
     private ?Company $company = null;
 
     #[ORM\ManyToOne(inversedBy: 'accountEntries')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?PatientAccount $account = null;
 
     #[ORM\Column(length: 20, enumType: AccountEntryType::class)]
-    private ?AccountEntryType $entryType = null;
+    private AccountEntryType $entryType;
 
+    /**
+     * Stored as string to preserve decimal precision
+     * Convention:
+     *  - CHARGE     => positive
+     *  - PAYMENT    => negative
+     *  - EXPENSE    => negative
+     *  - ADJUSTMENT => +/- allowed
+     */
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    private ?string $amount = null;
+    private string $amount;
 
     #[ORM\Column(length: 20, enumType: AccountSourceType::class)]
-    private ?AccountSourceType $sourceType = null;
+    private AccountSourceType $sourceType;
 
+    /**
+     * Optional reference ID (e.g. payment_id, visit_item_id)
+     */
     #[ORM\Column(nullable: true)]
     private ?int $sourceId = null;
 
@@ -40,10 +51,16 @@ class AccountEntry
     private ?string $description = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
+    private \DateTimeImmutable $createdAt;
 
+    #[ORM\ManyToOne]
     #[ORM\Column(nullable: true)]
-    private ?int $createdBy = null;
+    private ?User $createdBy = null;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable();
+    }
 
     public function getId(): ?int
     {
@@ -74,12 +91,12 @@ class AccountEntry
         return $this;
     }
 
-    public function getEntryType(): ?string
+    public function getEntryType(): ?AccountEntryType
     {
         return $this->entryType;
     }
 
-    public function setEntryType(string $entryType): static
+    public function setEntryType(AccountEntryType  $entryType): static
     {
         $this->entryType = $entryType;
 
@@ -98,12 +115,12 @@ class AccountEntry
         return $this;
     }
 
-    public function getSourceType(): ?string
+    public function getSourceType(): AccountSourceType
     {
         return $this->sourceType;
     }
 
-    public function setSourceType(string $sourceType): static
+    public function setSourceType(AccountSourceType $sourceType): self
     {
         $this->sourceType = $sourceType;
 
@@ -134,7 +151,7 @@ class AccountEntry
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
     }
@@ -156,5 +173,38 @@ class AccountEntry
         $this->createdBy = $createdBy;
 
         return $this;
+    }
+
+    // --------------------
+    // Ledger invariants
+    // --------------------
+
+    /**
+     * Call this before persisting.
+     * Enforces v2 financial rules.
+     */
+    public function validate(): void
+    {
+        if (
+            $this->entryType === AccountEntryType::EXPENSE &&
+            $this->account !== null
+        ) {
+            throw new \LogicException(
+                'Expense entries must not be linked to a patient account.'
+            );
+        }
+
+        if (
+            \in_array(
+                $this->entryType,
+                [AccountEntryType::CHARGE, AccountEntryType::PAYMENT],
+                true
+            ) &&
+            $this->account === null
+        ) {
+            throw new \LogicException(
+                'Charge and payment entries require a patient account.'
+            );
+        }
     }
 }

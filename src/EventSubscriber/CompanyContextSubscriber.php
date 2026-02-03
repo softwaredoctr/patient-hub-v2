@@ -5,7 +5,7 @@ namespace App\EventSubscriber;
 use App\Security\CompanyContext;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Bundle\SecurityBundle\Security;
 
 class CompanyContextSubscriber implements EventSubscriberInterface
 {

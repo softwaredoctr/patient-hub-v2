@@ -1,10 +1,10 @@
 <?php
-
 namespace App\Enum;
 
 enum AccountEntryType: string
 {
-    case CHARGE = 'CHARGE';
-    case PAYMENT = 'PAYMENT';
-    case ADJUSTMENT = 'ADJUSTMENT';
+    case CHARGE = 'CHARGE';         // + patient owes
+    case PAYMENT = 'PAYMENT';       // - patient pays
+    case EXPENSE = 'EXPENSE';       // - company spends
+    case ADJUSTMENT = 'ADJUSTMENT'; // +/- correction
 }
