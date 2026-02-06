@@ -27,7 +27,11 @@ class PatientAccount
     #[ORM\JoinColumn(nullable: false)]
     private ?Company $company = null;
 
-    #[ORM\ManyToOne]
+    // #[ORM\ManyToOne]
+    // #[ORM\JoinColumn(nullable: false)]
+    // private ?Patient $patient = null;
+
+    #[ORM\OneToOne(inversedBy: 'patientAccount')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Patient $patient = null;
 
@@ -99,5 +103,6 @@ class PatientAccount
         }
 
         return $this;
-    }
+    }  
+   
 }

@@ -1,0 +1,50 @@
+<h1>{{ patient.firstName }}</h1>
+
+<h2>Visits</h2>
+
+{% for visit in patient.visits %}
+    <h3>Visit #{{ visit.id }}</h3>
+
+    {% for item in visit.visitItems %}
+        <div style="margin-bottom: 8px">
+            {{ item.description }} — {{ item.amount }}
+
+            {% if item.status == 'DRAFT' %}
+                <form method="post" action="{{ path('visit_item_charge', {id: item.id}) }}">
+                    <button type="submit">Charge</button>
+                </form>
+            {% elseif item.status == 'CONFIRMED' %}
+                <form method="post" action="{{ path('visit_item_remove_charge', {id: item.id}) }}">
+                    <button type="submit">Remove charge</button>
+                </form>
+            {% endif %}
+        </div>
+    {% endfor %}
+{% endfor %}
+
+<hr>
+
+<h2>Record Payment</h2>
+
+<form method="post" action="{{ path('patient_pay', {id: patient.id}) }}">
+    <input
+        type="number"
+        step="0.01"
+        name="amount"
+        placeholder="Amount received"
+        required
+    >
+    <button type="submit">Record</button>
+</form>
+
+<hr>
+
+<h2>Ledger</h2>
+
+<ul>
+    {% for entry in patient.patientAccount.accountEntries %}
+        <li>
+            {{ entry.entryType }} — {{ entry.amount }} — {{ entry.description }}
+        </li>
+    {% endfor %}
+</ul>

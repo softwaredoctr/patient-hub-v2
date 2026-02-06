@@ -44,6 +44,9 @@ class Patient
     #[ORM\OneToMany(targetEntity: Visit::class, mappedBy: 'patient')]
     private Collection $visits;
 
+    #[ORM\OneToOne(mappedBy: 'patient', cascade: ['persist', 'remove'])]
+    private ?PatientAccount $patientAccount = null;
+
     public function __construct()
     {
         $this->visits = new ArrayCollection();
@@ -163,6 +166,24 @@ class Patient
             if ($visit->getPatient() === $this) {
                 $visit->setPatient(null);
             }
+        }
+
+        return $this;
+    }
+    public function getAccount(): ?PatientAccount
+    {
+        return $this->account;
+    }
+    public function getPatientAccount(): ?PatientAccount
+    {
+        return $this->patientAccount;
+    }
+    public function setPatientAccount(PatientAccount $patientAccount): static
+    {
+        $this->patientAccount = $patientAccount;
+
+        if ($patientAccount->getPatient() !== $this) {
+            $patientAccount->setPatient($this);
         }
 
         return $this;

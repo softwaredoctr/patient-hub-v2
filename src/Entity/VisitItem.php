@@ -121,4 +121,8 @@ class VisitItem
 
         $this->status = VisitItemStatus::CANCELLED;
     }
+    public function getStatus(): VisitItemStatus
+    {
+        return $this->status;
+    }
 }
