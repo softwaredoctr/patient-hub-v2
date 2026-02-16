@@ -15,9 +15,17 @@ abstract class TenantAwareRepository extends ServiceEntityRepository implements 
     }
 
     protected function qb(string $alias)
-    {        
-        return $this->createQueryBuilder($alias)
-            ->andWhere($alias . '.company = :company')
-            ->setParameter('company', $this->companyContext->getCompany());
+    {
+        $qb = $this->createQueryBuilder($alias);
+
+        $company = $this->companyContext->getCompany();
+
+        if ($company !== null) {
+            $qb
+                ->andWhere($alias . '.company = :company')
+                ->setParameter('company', $company);
+        }
+
+        return $qb;
     }
 }

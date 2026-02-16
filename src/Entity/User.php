@@ -4,9 +4,10 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ORM\Entity]
-class User implements UserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -16,12 +17,18 @@ class User implements UserInterface
     #[ORM\Column(length: 180, unique: true)]
     private string $email;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private Company $company;
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Company $company;
+
+    #[ORM\Column]
+    private string $password;
 
     #[ORM\Column(type: 'json')]
     private array $roles = [];
+
+    #[ORM\Column(type: 'boolean')]
+    private bool $isActive = true;
 
     public function getId(): ?int
     {
@@ -39,12 +46,12 @@ class User implements UserInterface
         return $this;
     }
 
-    public function getCompany(): Company
+    public function getCompany(): ?Company
     {
         return $this->company;
     }
 
-    public function setCompany(Company $company): self
+    public function setCompany(?Company $company): self
     {
         $this->company = $company;
         return $this;
@@ -52,7 +59,10 @@ class User implements UserInterface
 
     public function getRoles(): array
     {
-        return $this->roles ?: ['ROLE_STAFF'];
+        $roles = $this->roles;
+        $roles[] = 'ROLE_USER'; // ensure at least one role
+
+        return array_unique($roles);
     }
 
     public function setRoles(array $roles): self
@@ -66,8 +76,29 @@ class User implements UserInterface
         return $this->email;
     }
 
+    public function getPassword(): string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(string $password): self
+    {
+        $this->password = $password;
+        return $this;
+    }
+
     public function eraseCredentials(): void
     {
         // no-op for now
+    }
+    public function isActive(): bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(bool $isActive): self
+    {
+        $this->isActive = $isActive;
+        return $this;
     }
 }
