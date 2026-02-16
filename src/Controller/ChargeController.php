@@ -7,7 +7,9 @@ use App\Service\ChargeService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_STAFF')]
 final class ChargeController extends AbstractController
 {
     #[Route('/visit-item/{id}/charge', name: 'visit_item_charge', methods: ['POST'])]

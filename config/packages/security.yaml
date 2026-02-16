@@ -3,6 +3,11 @@ security:
     password_hashers:
         App\Entity\User: 'auto'
 
+    role_hierarchy:
+        ROLE_SUPER_ADMIN: [ROLE_COMPANY_ADMIN, ROLE_STAFF, ROLE_USER]
+        ROLE_COMPANY_ADMIN: [ROLE_STAFF, ROLE_USER]
+        ROLE_STAFF: [ROLE_USER]
+
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
         app_user_provider:
@@ -42,10 +47,22 @@ security:
 
     # Note: Only the *first* matching rule is applied
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
-        - { path: ^/login, roles: PUBLIC_ACCESS }
-        #- { path: ^/, roles: PUBLIC_ACCESS }
+        # Public Pages      
+        - { path: ^/login, roles: PUBLIC_ACCESS }  
+        - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/, roles: ROLE_USER }
+
+        # Super Admin only
+        - { path: ^/admin/companies, roles: ROLE_SUPER_ADMIN }
+
+        # Company Admin only
+        - { path: ^/admin/users, roles: ROLE_COMPANY_ADMIN }
+
+        # Financial reporting
+        - { path: ^/reports, roles: ROLE_COMPANY_ADMIN }
+
+        # Expenses
+        - { path: ^/expenses, roles: ROLE_COMPANY_ADMIN }
 
 when@test:
     security:
